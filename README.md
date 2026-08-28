@@ -54,3 +54,31 @@ pdf-translator/
 │
 ├── requirements.txt
 └── README.md
+
+
+
+
+El primer objetivo sería solamente:
+
+Convertir las 284 páginas del PDF en una representación JSON estructurada sin perder la información necesaria para reconstruir posteriormente el documento.
+
+
+☐ Detecta las 284 páginas
+☐ Extrae texto
+☐ Extrae bbox
+☐ Extrae fuentes/tamaño
+☐ Identifica imágenes
+☐ Genera IDs únicos
+☐ Guarda JSON válido
+☐ No modifica contenido
+☐ Puede ejecutarse varias veces
+
+primer objetivo:
+
+Página 19
+Página 22
+Página 31
+Página con código
+Página con imagen
+Página con listas
+
