@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0.0",
+  "id_scheme_version": 1,
+  "document_id": "not-a-uuid-v5",
+  "source": {
+    "file_name": "invalid.pdf",
+    "mime_type": "text/plain",
+    "byte_size": 0,
+    "sha256": "NOT-A-SHA256"
+  },
+  "extraction": {
+    "extractor_name": "",
+    "extractor_version": "",
+    "extracted_at": "not-a-date",
+    "status": "unknown"
+  },
+  "page_count": 0,
+  "pages": [],
+  "assets": [
+    {
+      "asset_id": "asset-1",
+      "sha256": "bad-hash",
+      "media_type": "",
+      "byte_size": 0,
+      "path": "",
+      "pixel_width": 0,
+      "pixel_height": 0
+    }
+  ],
+  "warnings": []
+}

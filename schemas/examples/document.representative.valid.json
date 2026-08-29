@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0.0",
+  "id_scheme_version": 1,
+  "document_id": "24bffd9a-1120-537e-94cf-781efe32791f",
+  "source": {
+    "file_name": "example.pdf",
+    "mime_type": "application/pdf",
+    "byte_size": 11,
+    "sha256": "4c7557600bf41b1317b296aa5e9e0d263e7452fbf2834d0760fb018a0c8df90b"
+  },
+  "extraction": {
+    "extractor_name": "contract-example",
+    "extractor_version": "1.0.0",
+    "extracted_at": "2026-08-29T18:00:00Z",
+    "status": "complete"
+  },
+  "page_count": 1,
+  "pages": [
+    {
+      "page_id": "acb62141-755c-5031-89fd-bd2a40ba0672",
+      "page_number": 1,
+      "printed_page_label": "i",
+      "width": 595,
+      "height": 842,
+      "rotation": 0,
+      "media_box": [0, 0, 595, 842],
+      "status": "complete",
+      "blocks": [
+        {
+          "block_id": "28fb9c34-31a8-5814-ba11-4d767da682f4",
+          "block_order": 1,
+          "source_index": 0,
+          "block_type": "title",
+          "bbox": [72, 72, 300, 102],
+          "lines": [
+            {
+              "line_id": "c716d7b4-6404-5c01-b793-d60d27dc4338",
+              "line_order": 1,
+              "source_index": 0,
+              "bbox": [72, 72, 300, 102],
+              "spans": [
+                {
+                  "span_id": "bdc58f59-dc19-5f15-9da8-861ac427a706",
+                  "span_order": 1,
+                  "source_index": 0,
+                  "text": "Example title",
+                  "bbox": [72, 72, 210, 102],
+                  "font": {
+                    "family": "Example Serif",
+                    "size": 24,
+                    "weight": "bold",
+                    "style": "normal",
+                    "color": "#000000"
+                  },
+                  "rotation": 0,
+                  "is_visible": true
+                }
+              ]
+            }
+          ],
+          "asset_occurrence_ids": [
+            "dcb48047-fcea-52a8-ac99-2a602e232a71"
+          ]
+        }
+      ],
+      "asset_occurrences": [
+        {
+          "asset_occurrence_id": "dcb48047-fcea-52a8-ac99-2a602e232a71",
+          "asset_id": "sha256:7ba451133c403e85ee98073f28fd640bc9aa5000f0d6fce0f0b06ff7ac4cd9c5",
+          "occurrence_order": 1,
+          "source_index": 0,
+          "bbox": [72, 130, 272, 280],
+          "transform": [200, 0, 0, 150, 72, 130]
+        }
+      ],
+      "warnings": []
+    }
+  ],
+  "assets": [
+    {
+      "asset_id": "sha256:7ba451133c403e85ee98073f28fd640bc9aa5000f0d6fce0f0b06ff7ac4cd9c5",
+      "sha256": "7ba451133c403e85ee98073f28fd640bc9aa5000f0d6fce0f0b06ff7ac4cd9c5",
+      "media_type": "image/png",
+      "byte_size": 13,
+      "path": "assets/images/7ba451133c403e85.png",
+      "pixel_width": 800,
+      "pixel_height": 600
+    }
+  ],
+  "warnings": []
+}

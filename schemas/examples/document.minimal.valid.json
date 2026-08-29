@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "id_scheme_version": 1,
+  "document_id": "24bffd9a-1120-537e-94cf-781efe32791f",
+  "source": {
+    "file_name": "example.pdf",
+    "mime_type": "application/pdf",
+    "byte_size": 11,
+    "sha256": "4c7557600bf41b1317b296aa5e9e0d263e7452fbf2834d0760fb018a0c8df90b"
+  },
+  "extraction": {
+    "extractor_name": "contract-example",
+    "extractor_version": "1.0.0",
+    "extracted_at": "2026-08-29T18:00:00Z",
+    "status": "complete"
+  },
+  "page_count": 1,
+  "pages": [
+    {
+      "page_id": "acb62141-755c-5031-89fd-bd2a40ba0672",
+      "page_number": 1,
+      "printed_page_label": null,
+      "width": 595,
+      "height": 842,
+      "rotation": 0,
+      "media_box": [0, 0, 595, 842],
+      "status": "complete",
+      "blocks": [],
+      "asset_occurrences": [],
+      "warnings": []
+    }
+  ],
+  "assets": [],
+  "warnings": []
+}

@@ -85,6 +85,134 @@ El dataset debe conservar tanto el contenido como su relación con el documento 
 
 La capa `raw` será inmutable: representará el contenido extraído sin correcciones ni traducciones. Las transformaciones se guardarán en capas posteriores.
 
+### Contrato de datos inicial
+
+El contrato de datos comienza en la versión `1.0.0`, utiliza **JSON Schema Draft 2020-12** y se limita inicialmente a la capa inmutable `raw`. Las capas `curated` y `translated` tendrán contratos propios y conservarán referencias explícitas a los IDs de origen.
+
+El contrato formal está disponible en `schemas/document.schema.json` y su explicación ampliada en `docs/data-contract.md`. Los datasets declaran `schema_version` e `id_scheme_version`.
+
+#### Jerarquía del documento
+
+```text
+document
+├── pages[]
+│   ├── blocks[]
+│   │   ├── lines[]
+│   │   │   └── spans[]
+│   │   └── asset_occurrence_ids[]
+│   └── asset_occurrences[]
+└── assets[]
+```
+
+- `document` contiene la identidad del archivo, sus metadatos y la colección ordenada de páginas.
+- `page` representa una página física del PDF.
+- `block` representa una unidad estructural, como un título, párrafo, lista, tabla, código, imagen, encabezado o pie.
+- `line` conserva las líneas detectadas dentro de un bloque.
+- `span` conserva el fragmento mínimo de texto con propiedades tipográficas homogéneas.
+- `asset` representa un recurso binario único, identificado por su contenido.
+- `asset_occurrence` representa una aparición concreta del recurso y conserva página, posición, transformación y orden.
+
+Los campos obligatorios, opcionales, tipos, formatos, enumeraciones y valores permitidos se especifican en `schemas/document.schema.json`. Las propiedades desconocidas no están permitidas en las entidades del contrato.
+
+El catálogo inicial de `block_type` incluye `title`, `heading`, `paragraph`, `list_item`, `table`, `code`, `image`, `caption`, `header`, `footer`, `page_number` y `unknown`. Una clasificación incierta usa `unknown`; nunca elimina silenciosamente el bloque.
+
+El texto de cada `span` conserva la secuencia Unicode entregada por el extractor. La capa `raw` no corrige ligaduras, espacios, guiones, saltos ni caracteres; cualquier normalización pertenece a `curated`.
+
+#### Sistema de coordenadas
+
+- Las coordenadas se normalizarán a puntos PDF; un punto equivale a `1/72` de pulgada.
+- El origen estará en la esquina superior izquierda de la página.
+- El eje X crecerá hacia la derecha y el eje Y hacia abajo.
+- Una caja se representará como `bbox: [x0, y0, x1, y1]`.
+- Deberá cumplirse `x0 <= x1` y `y0 <= y1`.
+- Cada página conservará su anchura, altura y rotación para poder interpretar correctamente sus coordenadas.
+- Los números se almacenarán con un máximo de cuatro decimales.
+- Las dimensiones visibles se basarán en `CropBox`; `media_box` conservará la caja física original cuando esté disponible.
+- Las coordenadas se almacenarán después de aplicar la rotación de página, que se conservará como `0`, `90`, `180` o `270`.
+- Las validaciones semánticas comprobarán que las cajas estén dentro de los límites de su página.
+
+#### Numeración de páginas
+
+- `page_number` identificará la posición física de la página dentro del PDF y comenzará en `1`.
+- `printed_page_label` almacenará, cuando pueda detectarse, la numeración visible impresa en el documento.
+- La identidad y el orden del dataset siempre utilizarán `page_number`; nunca dependerán de `printed_page_label`.
+
+#### Identificadores deterministas
+
+Todos los identificadores se calcularán a partir de valores canónicos. Para los UUID se utilizará UUID v5 con el namespace estándar `NAMESPACE_URL` y una cadena de nombre UTF-8 con los formatos siguientes:
+
+```text
+source_sha256 = SHA-256 de los bytes exactos del archivo de entrada
+
+document_id = UUIDv5(
+  NAMESPACE_URL,
+  "lab-pdf-translator:document:sha256:{source_sha256}"
+)
+
+page_id = UUIDv5(
+  NAMESPACE_URL,
+  "lab-pdf-translator:page:{document_id}:{page_number}"
+)
+
+block_id = UUIDv5(
+  NAMESPACE_URL,
+  "lab-pdf-translator:block:{page_id}:{block_order}"
+)
+
+line_id = UUIDv5(
+  NAMESPACE_URL,
+  "lab-pdf-translator:line:{block_id}:{line_order}"
+)
+
+span_id = UUIDv5(
+  NAMESPACE_URL,
+  "lab-pdf-translator:span:{line_id}:{span_order}"
+)
+
+asset_id = "sha256:{asset_sha256}"
+
+asset_occurrence_id = UUIDv5(
+  NAMESPACE_URL,
+  "lab-pdf-translator:asset-occurrence:{page_id}:{asset_id}:{occurrence_order}"
+)
+```
+
+Reglas asociadas:
+
+- `page_number`, `block_order`, `line_order` y `span_order` comenzarán en `1`.
+- `occurrence_order` también comenzará en `1`.
+- Los hashes se serializarán en hexadecimal minúsculo.
+- Bloques, líneas y spans se ordenarán por `(y0, x0, y1, x1, source_index)` después de redondear las coordenadas a cuatro decimales.
+- Las apariciones se ordenarán por `(y0, x0, y1, x1, asset_id, source_index)`.
+- `source_index` conservará la posición entregada por el extractor y actuará como último desempate.
+- Este orden geométrico no reconstruirá semánticamente documentos multicolumna; esa tarea pertenecerá a `curated`.
+- Procesar de nuevo el mismo archivo con la misma versión del contrato y del extractor producirá los mismos IDs.
+- El nombre o la ubicación del archivo no formarán parte de su identidad.
+- Si cambia cualquier byte del archivo de entrada, cambiarán `source_sha256` y `document_id`; el archivo será tratado como una nueva versión documental.
+- Recursos binarios idénticos compartirán `asset_id`, aunque aparezcan varias veces.
+- Los IDs de las capas `curated` y `translated` conservarán referencias explícitas a los IDs de origen y no reemplazarán la identidad de los elementos `raw`.
+- Cualquier cambio de algoritmo que pueda alterar IDs incrementará `id_scheme_version`.
+
+#### Procedencia, errores y evolución
+
+- La procedencia registra nombre original, MIME, tamaño, SHA-256, extractor, versión, fecha UTC y estado.
+- La fecha de extracción es informativa y no participa en los IDs.
+- Los estados posibles son `complete`, `partial` y `failed`.
+- Las páginas vacías se conservan con `blocks: []`.
+- Las páginas o documentos ilegibles, protegidos o parcialmente extraídos se conservan con su estado y advertencias; no desaparecen silenciosamente.
+- El contrato sigue versionado semántico: `PATCH` para cambios compatibles, `MINOR` para adiciones opcionales compatibles y `MAJOR` para cambios incompatibles.
+
+#### Artefactos del contrato
+
+- `schemas/document.schema.json`: contrato formal versionado.
+- `schemas/examples/document.minimal.valid.json`: documento mínimo válido.
+- `schemas/examples/document.representative.valid.json`: bloques, texto, tipografía y recursos.
+- `schemas/examples/document.missing-id.invalid.json`: ausencia de un campo obligatorio.
+- `schemas/examples/document.bad-identity.invalid.json`: formatos y valores no permitidos.
+- `docs/data-contract.md`: decisiones completas de identidad, orden, geometría, errores y evolución.
+
+La definición documental de esta subtarea está cerrada. La ejecución automática de los ejemplos contra el esquema, las comprobaciones semánticas y las pruebas de estabilidad se implementarán después de elegir la librería de validación en la siguiente subtarea de la fase 0.
+
 ### Traducción
 
 - Traducción por bloques con preservación del contexto del documento.
@@ -134,6 +262,11 @@ lab-pdf-translator/
 ├── config/
 │   ├── glossary.yaml      # Glosario y términos protegidos
 │   └── settings.yaml      # Configuración del flujo
+├── schemas/
+│   ├── document.schema.json
+│   └── examples/           # Ejemplos válidos e inválidos
+├── docs/
+│   └── data-contract.md    # Contrato de datos ampliado
 ├── src/
 │   ├── models/            # Esquemas del documento y sus bloques
 │   ├── extraction/        # Lectura y extracción de documentos
@@ -154,10 +287,12 @@ Esta estructura representa el diseño objetivo y se creará progresivamente dura
 
 ### Fase 0 — Definición y entorno
 
-- Definir el esquema de datos y las reglas de identificación.
-- Elegir las librerías de extracción, validación y renderizado.
-- Crear la estructura mínima del proyecto y su configuración.
-- Preparar pruebas unitarias y muestras representativas.
+- [x] Definir el esquema de datos de la capa `raw` y sus reglas de identificación.
+- [x] Formalizar el contrato mediante JSON Schema Draft 2020-12.
+- [x] Crear documentación y ejemplos válidos e inválidos del contrato.
+- [ ] Elegir las librerías de extracción, validación y renderizado.
+- [ ] Crear la estructura mínima del proyecto y su configuración.
+- [ ] Preparar pruebas unitarias, validaciones automáticas y muestras representativas.
 
 **Resultado:** contrato de datos versionado y proyecto ejecutable en local.
 
