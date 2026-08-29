@@ -248,6 +248,21 @@ La fidelidad visual exacta no es el objetivo de la primera versión. Se prioriza
 - **Observabilidad:** se registran tiempos, errores, advertencias y métricas básicas.
 - **Configurabilidad:** idiomas, glosarios, motor de traducción y opciones de salida no estarán fijados en el código.
 
+## Entorno y librerías seleccionadas
+
+El entorno objetivo inicial es **CPython 3.14.7**. Las dependencias directas están fijadas en `requirements.txt` y su elección, alcance, licencia y política de actualización se documentan en `docs/technology-stack.md`.
+
+| Responsabilidad | Librería |
+|---|---|
+| Extracción y análisis PDF | PyMuPDF 1.28.2 |
+| Validación JSON Schema | jsonschema 4.26.0 |
+| Generación de PDF | ReportLab 5.0.1 |
+| Generación de Word | python-docx-ng 2.1.0 |
+| Procesamiento de imágenes | Pillow 12.3.0 |
+| Configuración YAML | PyYAML 6.0.3 |
+
+OCR, traducción y detección automática de idioma quedan fuera de esta selección y se decidirán en sus respectivas fases. Antes de distribuir el proyecto como producto cerrado deberá revisarse la licencia AGPL/comercial de PyMuPDF.
+
 ## Arquitectura prevista
 
 ```text
@@ -266,7 +281,8 @@ lab-pdf-translator/
 │   ├── document.schema.json
 │   └── examples/           # Ejemplos válidos e inválidos
 ├── docs/
-│   └── data-contract.md    # Contrato de datos ampliado
+│   ├── data-contract.md    # Contrato de datos ampliado
+│   └── technology-stack.md # Selección y uso de librerías
 ├── src/
 │   ├── models/            # Esquemas del documento y sus bloques
 │   ├── extraction/        # Lectura y extracción de documentos
@@ -290,7 +306,7 @@ Esta estructura representa el diseño objetivo y se creará progresivamente dura
 - [x] Definir el esquema de datos de la capa `raw` y sus reglas de identificación.
 - [x] Formalizar el contrato mediante JSON Schema Draft 2020-12.
 - [x] Crear documentación y ejemplos válidos e inválidos del contrato.
-- [ ] Elegir las librerías de extracción, validación y renderizado.
+- [x] Elegir y documentar las librerías de extracción, validación y renderizado.
 - [ ] Crear la estructura mínima del proyecto y su configuración.
 - [ ] Preparar pruebas unitarias, validaciones automáticas y muestras representativas.
 

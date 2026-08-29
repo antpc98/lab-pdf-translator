@@ -1,0 +1,17 @@
+# Motor PDF: extracción estructurada, imágenes, metadatos y renderizado de páginas.
+PyMuPDF==1.28.2
+
+# Validación del contrato JSON Schema Draft 2020-12 y formatos sin extras GPL.
+jsonschema[format-nongpl]==4.26.0
+
+# Composición del PDF traducido.
+reportlab==5.0.1
+
+# Generación de documentos Word editables. Se importa como `docx`.
+python-docx-ng==2.1.0
+
+# Lectura, conversión y comprobación de imágenes.
+Pillow==12.3.0
+
+# Lectura segura de la configuración y los glosarios YAML.
+PyYAML==6.0.3
