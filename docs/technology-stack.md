@@ -1,5 +1,7 @@
 # Selección de librerías
 
+> Bitácora: 30/08/2026 — revisada la selección al cerrar la fase 0 e incorporadas las herramientas de prueba y cobertura.
+
 ## Decisión
 
 El entorno objetivo inicial es **CPython 3.14.7**. Las dependencias directas se fijan en `requirements.txt` para que el laboratorio parta de una combinación conocida y revisable.
@@ -125,6 +127,13 @@ Se utilizará para leer `config/settings.yaml` y `config/glossary.yaml`. La carg
 - **Procesamiento de tablas especializado:** solo se añadirá si PyMuPDF no cubre los casos reales.
 - **PyMuPDF4LLM:** no se necesita para el contrato geométrico `raw` y añadiría una abstracción innecesaria.
 
+## Dependencias de desarrollo
+
+- **pytest 9.1.1:** descubrimiento, parametrización y ejecución de pruebas unitarias, de contrato e integración.
+- **pytest-cov 7.1.0:** integración de Coverage.py con pytest. El umbral obligatorio del proyecto es del 90 % y está definido en `pyproject.toml`.
+
+Estas herramientas se fijan en `requirements-dev.txt`, que incluye a su vez las dependencias de ejecución para evitar entornos de prueba incompletos.
+
 ## Política de versiones
 
 - `requirements.txt` fija versiones directas exactas mientras se construye el primer flujo reproducible.
@@ -155,7 +164,7 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-La instalación debe realizarse dentro de un entorno virtual. `requirements.txt` no incluye todavía herramientas de desarrollo como el framework de pruebas o el linter; se seleccionarán al preparar la subtarea de pruebas unitarias.
+La instalación debe realizarse dentro de un entorno virtual. Para desarrollar y validar el proyecto se instala `requirements-dev.txt`; para ejecutar únicamente el futuro pipeline será suficiente `requirements.txt`.
 
 ## Criterios de aceptación
 

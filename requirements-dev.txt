@@ -1,0 +1,5 @@
+# Bitácora: 2026-08-30 - Dependencias para pruebas y cobertura de la fase 0.
+-r requirements.txt
+
+pytest==9.1.1
+pytest-cov==7.1.0

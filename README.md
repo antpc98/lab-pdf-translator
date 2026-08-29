@@ -4,7 +4,7 @@ Laboratorio para construir un flujo reproducible de extracción, gobierno, tradu
 
 El sistema transformará cada documento de entrada en un conjunto de datos estructurado y trazable. Sobre ese dataset se aplicarán reglas de normalización y traducción y, finalmente, se generará un documento cómodo de leer.
 
-> Estado actual: definición y diseño. La primera fase de desarrollo será la extracción estructurada del PDF de referencia incluido en `input/`.
+> Estado actual (30/08/2026): **fase 0 completada**. El contrato `raw`, la configuración, la estructura, los identificadores deterministas y sus validaciones automáticas están preparados. La siguiente fase será la extracción estructurada del PDF de referencia incluido en `input/`.
 
 ## Objetivos
 
@@ -211,7 +211,7 @@ Reglas asociadas:
 - `schemas/examples/document.bad-identity.invalid.json`: formatos y valores no permitidos.
 - `docs/data-contract.md`: decisiones completas de identidad, orden, geometría, errores y evolución.
 
-La definición documental de esta subtarea está cerrada. La ejecución automática de los ejemplos contra el esquema, las comprobaciones semánticas y las pruebas de estabilidad se implementarán después de elegir la librería de validación en la siguiente subtarea de la fase 0.
+La definición documental y su implementación de referencia están cerradas. Los ejemplos se validan automáticamente contra el esquema; las comprobaciones semánticas verifican geometría, relaciones, orden e IDs, y las pruebas confirman la estabilidad determinista.
 
 ### Traducción
 
@@ -269,6 +269,7 @@ OCR, traducción y detección automática de idioma quedan fuera de esta selecci
 - [`docs/configuration.md`](docs/configuration.md): explicación desde los fundamentos de YAML hasta cada opción, su validación y su efecto sobre la reproducibilidad.
 - [`docs/data-contract.md`](docs/data-contract.md): contrato semántico de la capa `raw`, geometría, IDs y evolución.
 - [`docs/technology-stack.md`](docs/technology-stack.md): librerías seleccionadas, responsabilidades, versiones, compatibilidad y licencias.
+- [`docs/testing-and-validation.md`](docs/testing-and-validation.md): estrategia de pruebas, muestras, comandos, resultados esperados y diagnóstico de fallos.
 
 ## Arquitectura del proyecto
 
@@ -291,10 +292,11 @@ lab-pdf-translator/
 │   ├── data-contract.md    # Contrato de datos ampliado
 │   ├── technology-stack.md # Selección y uso de librerías
 │   ├── project-structure.md# Guía del flujo y de cada carpeta
-│   └── configuration.md    # Referencia completa de configuración
+│   ├── configuration.md    # Referencia completa de configuración
+│   └── testing-and-validation.md # Pruebas y validación automática
 ├── src/
 │   └── lab_pdf_translator/
-│       ├── models/         # Entidades internas del documento
+│       ├── models/         # Entidades e identificadores deterministas
 │       ├── extraction/     # Lectura y extracción de documentos
 │       ├── processing/     # Limpieza, clasificación y normalización
 │       ├── translation/    # Motores y reglas de traducción
@@ -319,9 +321,20 @@ La estructura mínima ya está creada. Los paquetes delimitan responsabilidades,
 - [x] Crear documentación y ejemplos válidos e inválidos del contrato.
 - [x] Elegir y documentar las librerías de extracción, validación y renderizado.
 - [x] Crear y documentar la estructura mínima del proyecto y su configuración base.
-- [ ] Preparar pruebas unitarias, validaciones automáticas y muestras representativas.
+- [x] Preparar pruebas unitarias, validaciones automáticas y muestras representativas.
 
-**Resultado:** contrato de datos versionado y proyecto ejecutable en local.
+**Resultado:** contrato de datos versionado, proyecto ejecutable y controles automáticos reproducibles en local. La fase 0 queda cerrada el 30/08/2026 con 55 pruebas superadas y una cobertura de código del 90,74 %.
+
+### Ejecutar las comprobaciones de la fase 0
+
+Desde PowerShell y con las dependencias de `requirements-dev.txt` instaladas:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe scripts\validate_phase0.py
+```
+
+El primer comando debe terminar sin fallos y mantener una cobertura mínima del 90 %. El segundo debe mostrar todas las comprobaciones como `[PASS]`, finalizar con `RESULT: PASS` y devolver el código de salida `0`. La explicación completa se encuentra en [`docs/testing-and-validation.md`](docs/testing-and-validation.md).
 
 ### Fase 1 — Extracción estructurada
 

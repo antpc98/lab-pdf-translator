@@ -1,5 +1,7 @@
 # Contrato de datos de la capa raw
 
+> Bitácora: 30/08/2026 — contrato revisado al incorporar validación estructural, semántica y pruebas deterministas.
+
 ## Estado y alcance
 
 - Versión del contrato: `1.0.0`.
@@ -168,4 +170,4 @@ La definición del contrato `raw` se considera terminada cuando:
 5. Las reglas de identidad, orden, geometría, procedencia y versionado están documentadas.
 6. Los JSON de ejemplo tienen sintaxis válida.
 
-La ejecución automática de ejemplos contra el esquema y las pruebas de propiedades deterministas se incorporarán al elegir la librería de validación en la siguiente subtarea de la fase 0.
+Los seis criterios están cubiertos. Además, `validation/schema.py` ejecuta los ejemplos contra el esquema, `validation/semantic.py` comprueba las reglas que exceden JSON Schema y las pruebas automatizadas verifican las propiedades deterministas de los identificadores.

@@ -1,4 +1,5 @@
 # Glosario inicial. La lista permanece vacía hasta la fase de traducción.
+# Bitácora: 2026-08-30 - Estructura revisada y cubierta por validación automática.
 version: 1
 source_language: en
 target_language: es

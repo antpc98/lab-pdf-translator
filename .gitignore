@@ -13,6 +13,7 @@ __pycache__/
 .coverage
 .coverage.*
 htmlcov/
+coverage.xml
 .ruff_cache/
 .mypy_cache/
 
@@ -35,6 +36,7 @@ assets/images/*
 !assets/images/.gitkeep
 output/*
 !output/.gitkeep
+tmp/
 
 # Sistemas operativos y editores
 .DS_Store

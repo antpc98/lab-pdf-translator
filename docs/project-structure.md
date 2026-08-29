@@ -1,5 +1,7 @@
 # Guía de estructura y procesamiento
 
+> Bitácora: 30/08/2026 — estructura revisada tras implementar modelos de identidad, configuración y validación de la fase 0.
+
 ## 1. Qué representa este proyecto
 
 `lab-pdf-translator` no traduce directamente un PDF y lo sobrescribe. Utiliza un pipeline por capas:
@@ -272,7 +274,7 @@ No debe contener algoritmos de extracción, reglas de traducción o composición
 
 Contendrá pruebas unitarias, de contrato, integración y regresión visual.
 
-`tests/fixtures/` almacenará únicamente muestras pequeñas. Los archivos grandes y resultados temporales se generarán durante la prueba o permanecerán fuera de Git.
+`tests/fixtures/` almacena manifiestos y generadores de muestras pequeñas. Los archivos grandes y resultados temporales se generan durante la prueba o permanecen fuera de Git.
 
 ### `output/`
 
@@ -337,17 +339,15 @@ Una fase posterior solo debe consumir entradas válidas. `fail_fast: false` perm
 
 ## 9. Cómo crecerá la estructura
 
-La estructura actual contiene paquetes y configuración, pero todavía no implementa las fases.
+La estructura actual implementa la infraestructura transversal de la fase 0: configuración, identificadores deterministas, validación estructural y semántica y automatización de aceptación. Las fases funcionales de extracción, transformación, traducción y renderizado siguen delimitadas, pero aún no están implementadas.
 
 El crecimiento esperado es:
 
-1. Añadir modelos y cargador de configuración.
-2. Añadir validación del contrato y pruebas.
-3. Implementar extracción e IDs.
-4. Implementar procesamiento `curated`.
-5. Incorporar proveedor de traducción.
-6. Implementar renderizadores.
-7. Añadir OCR y capacidades multilingües avanzadas.
+1. Implementar extracción utilizando los IDs ya disponibles.
+2. Implementar procesamiento `curated`.
+3. Incorporar proveedor de traducción.
+4. Implementar renderizadores.
+5. Añadir OCR y capacidades multilingües avanzadas.
 
 Cada incorporación debe respetar las fronteras anteriores. Si una necesidad no encaja, primero se documenta la decisión y después se modifica la estructura.
 

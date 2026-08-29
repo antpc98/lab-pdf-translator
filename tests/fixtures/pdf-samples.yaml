@@ -1,0 +1,76 @@
+# Bitácora: 2026-08-30 - Muestras físicas del PDF inicial para regresión.
+document_glob: input/*.pdf
+expected_page_count: 284
+
+# physical_page siempre cuenta desde la primera página del archivo, no desde el
+# número impreso. Las evidencias son deliberadamente estables y poco ambiguas.
+samples:
+  - physical_page: 1
+    case: cover
+    purpose: Verificar portada, tipografía de gran tamaño e imagen de fondo.
+    required_text:
+      - Mastering
+      - Blockchain
+    minimum_text_characters: 50
+    minimum_images: 1
+
+  - physical_page: 2
+    case: full_page_image
+    purpose: Verificar una página sin texto extraíble pero con recurso gráfico.
+    required_text: []
+    minimum_text_characters: 0
+    minimum_images: 1
+
+  - physical_page: 19
+    case: chapter_opening
+    purpose: Verificar título de capítulo, subtítulo y párrafos con estilos distintos.
+    required_text:
+      - CHAPTER 1
+      - Origins of Blockchain Technology
+    minimum_text_characters: 1000
+    minimum_images: 0
+
+  - physical_page: 22
+    case: figures
+    purpose: Verificar varias figuras, captions y texto alrededor de imágenes.
+    required_text:
+      - Figure 1-2
+      - Figure 1-3
+    minimum_text_characters: 500
+    minimum_images: 2
+
+  - physical_page: 31
+    case: code_and_hashes
+    purpose: Verificar código, comillas, hashes largos y texto técnico.
+    required_text:
+      - keccak256
+      - SHA-256
+    minimum_text_characters: 2000
+    minimum_images: 0
+
+  - physical_page: 100
+    case: definition_list
+    purpose: Verificar una lista de conceptos con explicaciones extensas.
+    required_text:
+      - Custom currencies
+      - Decentralized exchange
+    minimum_text_characters: 1200
+    minimum_images: 0
+
+  - physical_page: 200
+    case: numbered_list_and_figure
+    purpose: Verificar pasos numerados, cifras, símbolos y un recurso gráfico.
+    required_text:
+      - "2. Hoard"
+      - "3. Manipulate oracle rate"
+    minimum_text_characters: 2000
+    minimum_images: 1
+
+  - physical_page: 284
+    case: back_cover
+    purpose: Verificar contraportada, texto promocional, copyright e imagen.
+    required_text:
+      - oreilly.com/online-learning
+      - O’Reilly Media
+    minimum_text_characters: 200
+    minimum_images: 1

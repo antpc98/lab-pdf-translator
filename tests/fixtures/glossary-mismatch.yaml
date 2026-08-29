@@ -1,0 +1,6 @@
+# Bitácora: 2026-08-30 - Fixture negativa para coherencia lingüística.
+version: 1
+source_language: fr
+target_language: es
+case_sensitive: false
+terms: []

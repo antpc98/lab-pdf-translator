@@ -1,5 +1,7 @@
 # Guía de configuración
 
+> Bitácora: 30/08/2026 — implementados el cargador seguro, la precedencia local y las validaciones automáticas.
+
 ## 1. Objetivo
 
 La configuración permite cambiar el comportamiento del pipeline sin editar el código Python.
@@ -452,7 +454,7 @@ logging:
 
 ## 10. Qué está activo actualmente
 
-Los archivos YAML y sus decisiones existen, pero todavía no hay un cargador ni comandos que los ejecuten. La estructura define el contrato de configuración para la siguiente implementación.
+El cargador de `src/lab_pdf_translator/config.py` ya lee los YAML mediante `yaml.safe_load`, combina opcionalmente `settings.local.yaml` y valida tipos, versiones, rutas, idiomas, glosario y límites. `scripts/validate_phase0.py` ejecuta estos controles como parte del cierre automático de la fase 0.
 
 El estado inicial es deliberadamente seguro:
 
@@ -476,4 +478,4 @@ La configuración base se considera definida cuando:
 6. Git ignora la futura configuración local privada.
 7. Se documentan precedencia, errores y efecto sobre reproducibilidad.
 
-La validación automática de estos campos se añadirá junto con el cargador y las pruebas unitarias.
+Los siete criterios están cubiertos por el cargador y por las pruebas de `tests/test_configuration.py`. Toda opción nueva deberá ampliar tanto su validación como su prueba y esta referencia.
