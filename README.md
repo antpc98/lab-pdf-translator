@@ -270,6 +270,8 @@ OCR, traducción y detección automática de idioma quedan fuera de esta selecci
 - [`docs/data-contract.md`](docs/data-contract.md): contrato semántico de la capa `raw`, geometría, IDs y evolución.
 - [`docs/technology-stack.md`](docs/technology-stack.md): librerías seleccionadas, responsabilidades, versiones, compatibilidad y licencias.
 - [`docs/testing-and-validation.md`](docs/testing-and-validation.md): estrategia de pruebas, muestras, comandos, resultados esperados y diagnóstico de fallos.
+- [`docs/automated-quality-gate.md`](docs/automated-quality-gate.md): barrera única, bootstrap de entorno, códigos de salida y futura integración continua.
+- [`docs/test-document-governance.md`](docs/test-document-governance.md): separación entre muestras privadas y publicables, licencias, atribución y migración.
 
 ## Arquitectura del proyecto
 
@@ -293,7 +295,9 @@ lab-pdf-translator/
 │   ├── technology-stack.md # Selección y uso de librerías
 │   ├── project-structure.md# Guía del flujo y de cada carpeta
 │   ├── configuration.md    # Referencia completa de configuración
-│   └── testing-and-validation.md # Pruebas y validación automática
+│   ├── testing-and-validation.md # Pruebas y validación automática
+│   ├── automated-quality-gate.md # Puerta única de aprobación
+│   └── test-document-governance.md # Uso privado y publicación
 ├── src/
 │   └── lab_pdf_translator/
 │       ├── models/         # Entidades e identificadores deterministas
@@ -323,18 +327,17 @@ La estructura mínima ya está creada. Los paquetes delimitan responsabilidades,
 - [x] Crear y documentar la estructura mínima del proyecto y su configuración base.
 - [x] Preparar pruebas unitarias, validaciones automáticas y muestras representativas.
 
-**Resultado:** contrato de datos versionado, proyecto ejecutable y controles automáticos reproducibles en local. La fase 0 queda cerrada el 30/08/2026 con 55 pruebas superadas y una cobertura de código del 90,74 %.
+**Resultado:** contrato de datos versionado, proyecto ejecutable y controles automáticos reproducibles en local. La fase 0 queda cerrada el 30/08/2026 con 58 pruebas superadas, una cobertura de código del 90,98 % y una barrera integral de calidad.
 
 ### Ejecutar las comprobaciones de la fase 0
 
-Desde PowerShell y con las dependencias de `requirements-dev.txt` instaladas:
+En Windows, el lanzador crea y activa el entorno cuando sea necesario, instala las dependencias y ejecuta todos los controles:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest
-.\.venv\Scripts\python.exe scripts\validate_phase0.py
+.\scripts\run_quality_gate.cmd
 ```
 
-El primer comando debe terminar sin fallos y mantener una cobertura mínima del 90 %. El segundo debe mostrar todas las comprobaciones como `[PASS]`, finalizar con `RESULT: PASS` y devolver el código de salida `0`. La explicación completa se encuentra en [`docs/testing-and-validation.md`](docs/testing-and-validation.md).
+El proceso debe mostrar dependencias, pruebas y aceptación como `[PASS]`, finalizar con `RESULT: PASS` y devolver el código `0`. La operación se explica en [`docs/automated-quality-gate.md`](docs/automated-quality-gate.md).
 
 ### Fase 1 — Extracción estructurada
 

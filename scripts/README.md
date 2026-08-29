@@ -1,10 +1,20 @@
 # Guía de ejecución de scripts
 
-> Bitácora: 30/08/2026 — añadida la guía operativa para ejecutar y revisar la validación de la fase 0.
+> Bitácora: 30/08/2026 — añadida la guía operativa y consolidada la barrera única de calidad.
 
 Esta carpeta contiene las interfaces de terminal del proyecto. Los scripts reciben la orden del usuario, llaman a la lógica reutilizable de `src/lab_pdf_translator/` y devuelven un resultado legible junto con un código de salida automatizable.
 
-## 1. Script disponible
+## 1. Ejecución recomendada
+
+La orden oficial de aprobación en Windows es:
+
+```powershell
+.\scripts\run_quality_gate.cmd
+```
+
+El lanzador crea `.venv` si falta, verifica Python 3.14, activa el entorno dentro de su proceso, instala `requirements-dev.txt` y ejecuta `quality_gate.py`. Esta barrera exige dependencias coherentes, pruebas, cobertura mínima del 90 % y aceptación completa. La referencia detallada está en [`../docs/automated-quality-gate.md`](../docs/automated-quality-gate.md).
+
+## 2. Validador específico
 
 `validate_phase0.py` realiza la comprobación de aceptación de la fase 0. No modifica el PDF, los datasets ni la configuración.
 
@@ -15,7 +25,7 @@ Comprueba, en este orden:
 3. Que los dos ejemplos válidos sean aceptados y los dos inválidos sean rechazados.
 4. Que el PDF de referencia tenga 284 páginas y cumpla las expectativas de ocho páginas representativas.
 
-## 2. Requisitos previos
+## 3. Requisitos previos
 
 Abre PowerShell en la raíz del repositorio, donde están `README.md` y `requirements-dev.txt`:
 
@@ -45,7 +55,7 @@ python -m venv .venv
 
 Se invoca directamente el Python del entorno virtual, por lo que no es necesario ejecutar `Activate.ps1` ni cambiar la política de ejecución de PowerShell.
 
-## 3. Ejecutar la validación
+## 4. Ejecutar solo la validación
 
 Desde la raíz del proyecto:
 
@@ -66,7 +76,7 @@ PHASE 0 VALIDATION
 RESULT: PASS
 ```
 
-## 4. Cómo revisar la salida
+## 5. Cómo revisar la salida
 
 Revisa estas cinco condiciones:
 
@@ -90,7 +100,7 @@ Debe mostrar:
 
 `RESULT: PASS` y el código `0` significan que la barrera automática está superada. Un `[FAIL]`, `RESULT: FAIL` o un código distinto de `0` impide considerar válida la ejecución.
 
-## 5. Interpretar un fallo
+## 6. Interpretar un fallo
 
 | Control | Qué revisar primero |
 |---|---|
@@ -108,24 +118,24 @@ Cuando falla un control, el script añade debajo un diagnóstico parecido a este
 
 El texto tras `at` indica la ruta lógica del problema y el resto explica la condición incumplida. Corrige el archivo señalado y vuelve a ejecutar el comando completo. No cambies una expectativa únicamente para ocultar un fallo: confirma antes que el contrato o la muestra realmente deban cambiar.
 
-## 6. Ejecutar todas las pruebas
+## 7. Ejecutar todas las pruebas
 
 La validación anterior es el resumen de aceptación. Antes de cerrar cambios de código también debe ejecutarse la batería completa:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe -m pytest --cov=lab_pdf_translator --cov-report=term-missing
 ```
 
 En el cierre inicial de la fase 0 la referencia es:
 
 ```text
-55 passed
-Required test coverage of 90.0% reached. Total coverage: 90.74%
+58 passed
+Required test coverage of 90.0% reached. Total coverage: 90.98%
 ```
 
 El número de pruebas podrá crecer, pero nunca debe aparecer `failed` o `error`, y la cobertura total debe mantenerse como mínimo en el 90 %.
 
-## 7. Lista final de conformidad
+## 8. Lista final de conformidad
 
 Antes de dar la revisión por buena confirma:
 
@@ -138,7 +148,7 @@ Antes de dar la revisión por buena confirma:
 
 La explicación técnica y la estrategia completa de pruebas están en [`../docs/testing-and-validation.md`](../docs/testing-and-validation.md).
 
-## 8. Scripts de fases posteriores
+## 9. Scripts de fases posteriores
 
 La estructura prevé futuras interfaces como `extract.py`, `transform.py`, `translate.py`, `render.py` y `run_pipeline.py`. Se documentarán aquí cuando su comportamiento exista y tenga pruebas; sus nombres no implican que estén implementados actualmente.
 

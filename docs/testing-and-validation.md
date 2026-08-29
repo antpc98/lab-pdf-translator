@@ -23,6 +23,8 @@ La calidad se divide en cuatro niveles:
 | `validation/semantic.py` | IDs, orden, geometría y relaciones que JSON Schema no puede expresar por sí solo. |
 | `validation/automation.py` | Orquestación sin efectos laterales y reporte uniforme de controles. |
 | `scripts/validate_phase0.py` | Interfaz de terminal y códigos de salida aptos para automatización. |
+| `scripts/quality_gate.py` | Une dependencias, pruebas, cobertura y aceptación en una decisión obligatoria. |
+| `scripts/run_quality_gate.cmd` | Prepara y activa automáticamente el entorno Windows antes de ejecutar la barrera. |
 | `tests/` | Pruebas positivas, negativas, de frontera y de integración. |
 
 Los errores se representan mediante objetos estructurados con código, ruta y mensaje. Esto permite mostrar un diagnóstico humano ahora y reutilizar la misma información en logs o CI más adelante.
@@ -77,17 +79,17 @@ No es obligatorio activar el entorno virtual. Invocar su intérprete directament
 ### Batería completa
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe -m pytest --cov=lab_pdf_translator --cov-report=term-missing
 ```
 
 Resultado de referencia al cerrar la fase 0:
 
 ```text
-55 passed
-TOTAL coverage: 90.74%
+58 passed
+TOTAL coverage: 90.98%
 ```
 
-`pyproject.toml` exige al menos un 90 % de cobertura. Por tanto, pytest devuelve código `0` solo si no existen fallos y se conserva el umbral; devuelve un código distinto de cero ante un test fallido, un error de configuración o cobertura insuficiente.
+`pyproject.toml` exige al menos un 90 % de cobertura. La opción `--cov` es necesaria para aplicar ese umbral; por ello está incluida obligatoriamente en la barrera automática. El comando anterior devuelve código `0` solo si no existen fallos y se conserva la cobertura.
 
 ### Pruebas rápidas sin PDF
 
@@ -139,7 +141,9 @@ La validación no modifica datasets ni documentos. Recoge todos los problemas ra
 
 Toda regla nueva debe incorporar al menos un caso válido y uno inválido. Todo defecto corregido debe conservar una prueba de regresión. Los fixtures binarios grandes no se duplican: se referencian mediante manifiestos o se generan en directorios temporales. Cada nuevo módulo de código debe mantener la fecha de intervención en su bloque de bitácora y comentarios centrados en decisiones, no en repetir instrucciones evidentes.
 
-Antes de integrar un cambio deben pasar, como mínimo, la batería completa y `validate_phase0.py`. Si cambia una muestra real, debe revisarse visualmente la página afectada además de actualizar sus expectativas.
+Antes de integrar un cambio debe pasar `scripts/quality_gate.py`, que reúne la batería completa y `validate_phase0.py`. Si cambia una muestra real, debe revisarse visualmente la página afectada además de actualizar sus expectativas.
+
+La operación unificada y el bootstrap Windows se detallan en [`automated-quality-gate.md`](automated-quality-gate.md).
 
 ## 9. Límites actuales
 
