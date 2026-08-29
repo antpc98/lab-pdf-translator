@@ -1,0 +1,12 @@
+# Glosario inicial. La lista permanece vacía hasta la fase de traducción.
+version: 1
+source_language: en
+target_language: es
+case_sensitive: false
+
+# Cada término futuro seguirá esta forma:
+# - source: smart contract
+#   target: contrato inteligente
+#   mode: preferred
+#   notes: Término técnico acordado para todo el documento.
+terms: []

@@ -263,7 +263,14 @@ El entorno objetivo inicial es **CPython 3.14.7**. Las dependencias directas est
 
 OCR, traducción y detección automática de idioma quedan fuera de esta selección y se decidirán en sus respectivas fases. Antes de distribuir el proyecto como producto cerrado deberá revisarse la licencia AGPL/comercial de PyMuPDF.
 
-## Arquitectura prevista
+## Documentación detallada
+
+- [`docs/project-structure.md`](docs/project-structure.md): recorrido completo del documento, función de cada carpeta, límites entre módulos y reglas de versionado.
+- [`docs/configuration.md`](docs/configuration.md): explicación desde los fundamentos de YAML hasta cada opción, su validación y su efecto sobre la reproducibilidad.
+- [`docs/data-contract.md`](docs/data-contract.md): contrato semántico de la capa `raw`, geometría, IDs y evolución.
+- [`docs/technology-stack.md`](docs/technology-stack.md): librerías seleccionadas, responsabilidades, versiones, compatibilidad y licencias.
+
+## Arquitectura del proyecto
 
 ```text
 lab-pdf-translator/
@@ -282,22 +289,26 @@ lab-pdf-translator/
 │   └── examples/           # Ejemplos válidos e inválidos
 ├── docs/
 │   ├── data-contract.md    # Contrato de datos ampliado
-│   └── technology-stack.md # Selección y uso de librerías
+│   ├── technology-stack.md # Selección y uso de librerías
+│   ├── project-structure.md# Guía del flujo y de cada carpeta
+│   └── configuration.md    # Referencia completa de configuración
 ├── src/
-│   ├── models/            # Esquemas del documento y sus bloques
-│   ├── extraction/        # Lectura y extracción de documentos
-│   ├── processing/        # Limpieza, clasificación y normalización
-│   ├── translation/       # Motores y reglas de traducción
-│   ├── validation/        # Controles de calidad
-│   └── rendering/         # Generación de PDF y DOCX
+│   └── lab_pdf_translator/
+│       ├── models/         # Entidades internas del documento
+│       ├── extraction/     # Lectura y extracción de documentos
+│       ├── processing/     # Limpieza, clasificación y normalización
+│       ├── translation/    # Motores y reglas de traducción
+│       ├── validation/     # Controles de calidad
+│       └── rendering/      # Generación de PDF y DOCX
 ├── scripts/               # Puntos de entrada del flujo
 ├── output/                # Documentos generados
+├── logs/                  # Evidencia operacional local
 ├── tests/                 # Pruebas automáticas y muestras
 ├── requirements.txt
 └── README.md
 ```
 
-Esta estructura representa el diseño objetivo y se creará progresivamente durante las fases de desarrollo.
+La estructura mínima ya está creada. Los paquetes delimitan responsabilidades, pero todavía no implementan el procesamiento; se completarán progresivamente durante las fases de desarrollo. Los datasets, imágenes, documentos finales, logs y el entorno `.venv` están excluidos de Git mediante `.gitignore`.
 
 ## Fases de desarrollo
 
@@ -307,7 +318,7 @@ Esta estructura representa el diseño objetivo y se creará progresivamente dura
 - [x] Formalizar el contrato mediante JSON Schema Draft 2020-12.
 - [x] Crear documentación y ejemplos válidos e inválidos del contrato.
 - [x] Elegir y documentar las librerías de extracción, validación y renderizado.
-- [ ] Crear la estructura mínima del proyecto y su configuración.
+- [x] Crear y documentar la estructura mínima del proyecto y su configuración base.
 - [ ] Preparar pruebas unitarias, validaciones automáticas y muestras representativas.
 
 **Resultado:** contrato de datos versionado y proyecto ejecutable en local.

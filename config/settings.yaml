@@ -1,0 +1,79 @@
+# Configuración base del laboratorio.
+# Las rutas son relativas a la raíz del repositorio.
+
+project:
+  name: lab-pdf-translator
+  environment: development
+
+contract:
+  schema_path: schemas/document.schema.json
+  schema_version: 1.0.0
+  id_scheme_version: 1
+
+paths:
+  input_dir: input
+  raw_data_dir: data/raw
+  curated_data_dir: data/curated
+  translated_data_dir: data/translated
+  image_dir: assets/images
+  output_dir: output
+  log_dir: logs
+
+pipeline:
+  source_language: en
+  target_language: es
+  detect_source_language: false
+  max_pages: 1000
+  batch_size: 25
+  resume: true
+  overwrite: false
+  fail_fast: false
+
+extraction:
+  engine: pymupdf
+  include_text: true
+  include_images: true
+  include_invisible_text: true
+  preserve_raw_unicode: true
+  coordinate_precision: 4
+  page_selection: []
+
+validation:
+  schema_enabled: true
+  format_checker_enabled: true
+  semantic_checks_enabled: true
+  stop_on_schema_error: true
+  max_reported_errors: 100
+
+translation:
+  enabled: false
+  provider: null
+  glossary_path: config/glossary.yaml
+
+rendering:
+  pdf:
+    enabled: true
+    engine: reportlab
+    preserve_font_family: true
+    preserve_font_size: true
+    allow_text_reflow: true
+    fallback_fonts:
+      - Arial
+      - DejaVu Sans
+  docx:
+    enabled: false
+    engine: python-docx-ng
+  cover:
+    enabled: true
+    title: Traducción de documento
+    subtitle: null
+  footer:
+    enabled: true
+    show_page_number: true
+    template: "Página {page_number} de {page_count}"
+
+logging:
+  level: INFO
+  console: true
+  file: true
+  file_name: pipeline.log

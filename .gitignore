@@ -1,0 +1,44 @@
+# Entorno virtual local
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Pruebas, cobertura y herramientas
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.ruff_cache/
+.mypy_cache/
+
+# Configuración local y secretos
+.env
+.env.*
+!.env.example
+config/settings.local.yaml
+
+# Logs y artefactos generados
+logs/*
+!logs/.gitkeep
+data/raw/*
+!data/raw/.gitkeep
+data/curated/*
+!data/curated/.gitkeep
+data/translated/*
+!data/translated/.gitkeep
+assets/images/*
+!assets/images/.gitkeep
+output/*
+!output/.gitkeep
+
+# Sistemas operativos y editores
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
