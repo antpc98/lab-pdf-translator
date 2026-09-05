@@ -16,7 +16,7 @@ El lanzador crea `.venv` si falta, verifica Python 3.14, activa el entorno dentr
 
 ## 2. Validador específico
 
-`validate_phase0.py` realiza la comprobación de aceptación de la fase 0. No modifica el PDF, los datasets ni la configuración.
+`validate_phase0.py` realiza la comprobación de aceptación de la fase 0. `validate_phase2.py` valida la publicación Curated y el DocumentProfile de Fase 2. Ninguno modifica el PDF, los datasets ni la configuración.
 
 Comprueba, en este orden:
 
@@ -24,6 +24,8 @@ Comprueba, en este orden:
 2. Que `schemas/document.schema.json` sea un JSON Schema Draft 2020-12 correcto.
 3. Que los dos ejemplos válidos sean aceptados y los dos inválidos sean rechazados.
 4. Que el PDF de referencia tenga 284 páginas y cumpla las expectativas de ocho páginas representativas.
+
+`validate_phase2.py` comprueba el esquema Curated, la igualdad entre el perfil embebido y el publicado, procedencia, protección, integridad de líneas de código, separación entre `page_reference` y `page_number`, regresiones técnicas conocidas y advertencias de orden de lectura.
 
 ## 3. Requisitos previos
 
@@ -61,6 +63,7 @@ Desde la raíz del proyecto:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\validate_phase0.py
+.\.venv\Scripts\python.exe scripts\validate_phase2.py
 ```
 
 Una ejecución correcta debe imprimir:
@@ -120,7 +123,7 @@ El texto tras `at` indica la ruta lógica del problema y el resto explica la con
 
 ## 7. Ejecutar todas las pruebas
 
-La validación anterior es el resumen de aceptación. Antes de cerrar cambios de código también debe ejecutarse la batería completa:
+La barrera integrada `quality_gate.py` resume las fases 0–2. Antes de cerrar cambios de código también debe ejecutarse la batería completa:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest --cov=lab_pdf_translator --cov-report=term-missing

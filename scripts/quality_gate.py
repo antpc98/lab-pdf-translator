@@ -18,6 +18,7 @@ from lab_pdf_translator.models.identifiers import sha256_file  # noqa: E402
 from lab_pdf_translator.validation.quality_gate import run_quality_gate  # noqa: E402
 from lab_pdf_translator.validation.schema import load_json, validate_schema  # noqa: E402
 from lab_pdf_translator.validation.semantic import validate_semantics  # noqa: E402
+from validate_phase2 import validate_published  # noqa: E402
 
 
 def _phase1_raw_check() -> tuple[bool, str]:
@@ -37,17 +38,19 @@ def _phase1_raw_check() -> tuple[bool, str]:
 def main() -> int:
     """Ejecuta todas las etapas y devuelve 0 exclusivamente con aprobación total."""
 
-    print("QUALITY GATE - PHASE 1", flush=True)
+    print("QUALITY GATE - PHASES 0-2", flush=True)
     print("=" * 72, flush=True)
     report = run_quality_gate(PROJECT_ROOT)
     phase1_passed, phase1_detail = _phase1_raw_check()
+    phase2_issues = validate_published(PROJECT_ROOT)
     print("=" * 72)
     for check in report.checks:
         status = "PASS" if check.passed else "FAIL"
         print(f"[{status}] {check.name}: {check.detail}")
     print(f"[{'PASS' if phase1_passed else 'FAIL'}] phase1_raw: {phase1_detail}")
+    print(f"[{'PASS' if not phase2_issues else 'FAIL'}] phase2_curated: " + ("schema, profile, semantics and regressions valid" if not phase2_issues else "; ".join(phase2_issues[:5])))
     print("=" * 72)
-    passed = report.passed and phase1_passed
+    passed = report.passed and phase1_passed and not phase2_issues
     print("RESULT: PASS" if passed else "RESULT: FAIL")
     return 0 if passed else 1
 

@@ -56,6 +56,8 @@ lab-pdf-translator/
 │   └── glossary.yaml
 ├── schemas/
 │   ├── document.schema.json
+│   ├── curated-document.schema.json
+│   ├── document-profile.schema.json
 │   └── examples/
 ├── docs/
 │   ├── data-contract.md
@@ -66,6 +68,7 @@ lab-pdf-translator/
 │   └── lab_pdf_translator/
 │       ├── models/
 │       ├── extraction/
+│       ├── curation/
 │       ├── processing/
 │       ├── translation/
 │       ├── validation/
@@ -103,16 +106,16 @@ La capa `raw` es inmutable: si algo se interpreta mal, se corrige en la siguient
 
 ### Paso 3: normalización curated
 
-El módulo `processing` recibe exclusivamente datos `raw` válidos. Entre sus futuras responsabilidades estarán:
+El módulo `curation` recibe exclusivamente datos `raw` válidos y ejecuta el perfil documental determinista seguido de la normalización semántica. Sus responsabilidades actuales incluyen:
 
 - Unir líneas que pertenecen al mismo párrafo.
 - Detectar encabezados y pies repetidos.
 - Reconstruir el orden semántico de varias columnas.
 - Clasificar elementos dudosos.
 - Proteger código, cifras, fórmulas y enlaces.
-- Preparar segmentos con contexto suficiente para traducir.
+- Preparar segmentos con contexto suficiente para traducir y acciones derivables para F3.
 
-El resultado se guarda en `data/curated/`. Cada registro conserva referencias a sus IDs `raw`.
+El resultado se guarda en `data/curated/`. Cada registro conserva referencias a sus IDs `raw`; el `DocumentProfile` se publica como artefacto complementario determinista. La arquitectura completa está en `architecture.md`.
 
 ### Paso 4: traducción
 

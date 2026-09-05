@@ -39,6 +39,14 @@ extraction:
   coordinate_precision: 4
   page_selection: []
 
+curation:
+  header_footer_recurrence_ratio: 0.08
+  header_footer_minimum_pages: 3
+  line_proximity_multiplier: 1.8
+  column_split_ratio: 0.48
+  heading_size_ratio: 1.35
+  hyphenation_policy: conservative_lowercase_continuation
+
 validation:
   schema_enabled: true
   format_checker_enabled: true

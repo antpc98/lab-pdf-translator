@@ -81,6 +81,7 @@ def _validate_settings(root: Path, settings: Mapping[str, Any]) -> None:
         "paths",
         "pipeline",
         "extraction",
+        "curation",
         "validation",
         "translation",
         "rendering",
@@ -109,6 +110,11 @@ def _validate_settings(root: Path, settings: Mapping[str, Any]) -> None:
         raise ConfigurationError("extraction.page_selection must contain positive page numbers")
     if len(pages) != len(set(pages)):
         raise ConfigurationError("extraction.page_selection must not contain duplicates")
+
+    curation = _require_mapping(settings, "curation")
+    _require_exact_keys(curation, {"header_footer_recurrence_ratio", "header_footer_minimum_pages", "line_proximity_multiplier", "column_split_ratio", "heading_size_ratio", "hyphenation_policy"}, "curation")
+    if not isinstance(curation["header_footer_recurrence_ratio"], (int, float)) or not 0 < curation["header_footer_recurrence_ratio"] <= 1:
+        raise ConfigurationError("curation.header_footer_recurrence_ratio must be between 0 and 1")
 
     contract = _require_mapping(settings, "contract")
     schema_path = _resolve_within_root(root, contract.get("schema_path", ""), "contract.schema_path")

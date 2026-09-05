@@ -24,6 +24,8 @@ coverage.xml
 config/settings.local.yaml
 
 # Logs y artefactos generados
+exports/*
+!exports/.gitkeep
 logs/*
 !logs/.gitkeep
 data/raw/*

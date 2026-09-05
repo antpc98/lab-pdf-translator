@@ -1,0 +1,13 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://lab-pdf-translator.local/schemas/document-profile.schema.json",
+  "title":"Deterministic document classification profile",
+  "type":"object","additionalProperties":false,
+  "required":["profile_version","document_id","body_text_baseline","cover_page","typography_clusters","navigation_families","structural_label_families","technical_families","geometry","font_distribution","font_size_distribution"],
+  "properties":{
+    "profile_version":{"const":"1.0.0"},"document_id":{"type":"string","format":"uuid"},
+    "body_text_baseline":{"type":"object"},"cover_page":{"type":["integer","null"]},"typography_clusters":{"type":"array","items":{"type":"object"}},
+    "navigation_families":{"type":"array","items":{"type":"object"}},"structural_label_families":{"type":"array","items":{"type":"object"}},"technical_families":{"type":"array","items":{"type":"object"}},
+    "geometry":{"type":"object"},"font_distribution":{"type":"array","items":{"type":"object"}},"font_size_distribution":{"type":"array","items":{"type":"object"}}
+  }
+}

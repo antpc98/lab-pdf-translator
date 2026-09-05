@@ -4,7 +4,15 @@ Laboratorio para construir un flujo reproducible de extracción, gobierno, tradu
 
 El sistema transformará cada documento de entrada en un conjunto de datos estructurado y trazable. Sobre ese dataset se aplicarán reglas de normalización y traducción y, finalmente, se generará un documento cómodo de leer.
 
-> Estado actual (05/09/2026): **fase 1 completada**. La extracción RAW usa PyMuPDF, IDs deterministas, validación, publicación atómica y checkpoints de reanudación.
+> Estado actual (06/09/2026): **Fase 2 aceptada técnicamente, pendiente del commit/push de finalización**. El pipeline ya soporta extracción determinista, RAW inmutable, perfil documental específico, Curated semántico, protección técnica y contrato de acciones para F3. Fase 3 no se ha iniciado.
+
+## Ejecutar la Fase 2
+
+Con RAW disponible, ejecute `python -m lab_pdf_translator normalize` o `./run_lab.ps1 -Phase 2`. El resultado se publica en `data/curated/document.json`; RAW nunca se modifica.
+
+La normalización usa dos pasadas: primero construye un `DocumentProfile` determinista a partir de tipografía, geometría, recurrencia y posición; después clasifica unidades con `semantic_type`, `document_role` y `classification_family`. Las referencias de TOC/índice se guardan como `page_reference`, separadas de `page_number`. El código conserva líneas y espacios; los valores técnicos no traducibles y los tokens incrustados se protegen de forma explícita. Las ambigüedades de orden de lectura generan advertencias auditables y los casos sin evidencia suficiente permanecen como `unknown`.
+
+Los contratos están en `schemas/curated-document.schema.json` y `schemas/document-profile.schema.json`. La explicación operativa y las reglas de consumo por Fase 3 están en `docs/phase-2-curated.md`; el resultado aceptado y la arquitectura final están en `docs/phase-2-final-report.md` y `docs/architecture.md`.
 
 ## Ejecutar la Fase 1
 
