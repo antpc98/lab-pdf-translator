@@ -1,6 +1,8 @@
 # Guía de estructura y procesamiento
 
 > Bitácora: 30/08/2026 — estructura revisada tras implementar modelos de identidad, configuración y validación de la fase 0.
+>
+> Bitácora: 30/08/2026 — Fase 1: incorporado el plan modular y los límites arquitectónicos de extracción.
 
 ## 1. Qué representa este proyecto
 
@@ -208,6 +210,7 @@ Contiene decisiones duraderas que no caben en el README.
 - `technology-stack.md`: librerías y licencias.
 - `project-structure.md`: esta guía.
 - `configuration.md`: referencia de configuración.
+- `phase-1-extraction-plan.md`: arquitectura, subtareas, evidencias y Definition of Done de la extracción.
 
 ### `src/lab_pdf_translator/`
 

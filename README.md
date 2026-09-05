@@ -4,7 +4,29 @@ Laboratorio para construir un flujo reproducible de extracción, gobierno, tradu
 
 El sistema transformará cada documento de entrada en un conjunto de datos estructurado y trazable. Sobre ese dataset se aplicarán reglas de normalización y traducción y, finalmente, se generará un documento cómodo de leer.
 
-> Estado actual (30/08/2026): **fase 0 completada**. El contrato `raw`, la configuración, la estructura, los identificadores deterministas y sus validaciones automáticas están preparados. La siguiente fase será la extracción estructurada del PDF de referencia incluido en `input/`.
+> Estado actual (05/09/2026): **fase 1 completada**. La extracción RAW usa PyMuPDF, IDs deterministas, validación, publicación atómica y checkpoints de reanudación.
+
+## Ejecutar la Fase 1
+
+Coloque exactamente un PDF en `input/` y ejecute en PowerShell:
+
+```powershell
+.\run_lab.ps1
+```
+
+Si hay varios PDFs, seleccione uno sin ambigüedad:
+
+```powershell
+.\run_lab.ps1 -InputFile .\input\document.pdf
+```
+
+El resultado validado se publica en `data/raw/document.json`; las imágenes deduplicadas se guardan en `assets/images/`. Los checkpoints temporales están en `checkpoints/` y permiten continuar mediante `-Resume`; se eliminan automáticamente tras una ejecución satisfactoria. Los logs operacionales están en `logs/phase-1-extraction.log`.
+
+Para aprobar todos los controles, incluido RAW, assets, tests y cobertura:
+
+```powershell
+.\.venv\Scripts\python.exe .\scripts\quality_gate.py
+```
 
 ## Objetivos
 
@@ -272,6 +294,7 @@ OCR, traducción y detección automática de idioma quedan fuera de esta selecci
 - [`docs/testing-and-validation.md`](docs/testing-and-validation.md): estrategia de pruebas, muestras, comandos, resultados esperados y diagnóstico de fallos.
 - [`docs/automated-quality-gate.md`](docs/automated-quality-gate.md): barrera única, bootstrap de entorno, códigos de salida y futura integración continua.
 - [`docs/test-document-governance.md`](docs/test-document-governance.md): separación entre muestras privadas y publicables, licencias, atribución y migración.
+- [`docs/phase-1-extraction-plan.md`](docs/phase-1-extraction-plan.md): subtareas, arquitectura, reanudación, evidencias y Definition of Done de la extracción `raw`.
 
 ## Arquitectura del proyecto
 
@@ -297,7 +320,8 @@ lab-pdf-translator/
 │   ├── configuration.md    # Referencia completa de configuración
 │   ├── testing-and-validation.md # Pruebas y validación automática
 │   ├── automated-quality-gate.md # Puerta única de aprobación
-│   └── test-document-governance.md # Uso privado y publicación
+│   ├── test-document-governance.md # Uso privado y publicación
+│   └── phase-1-extraction-plan.md # Plan y Done de extracción raw
 ├── src/
 │   └── lab_pdf_translator/
 │       ├── models/         # Entidades e identificadores deterministas
@@ -341,21 +365,28 @@ El proceso debe mostrar dependencias, pruebas y aceptación como `[PASS]`, final
 
 ### Fase 1 — Extracción estructurada
 
-Convertir el PDF de referencia en una representación JSON sin modificar su contenido.
+Convertir un PDF digital compatible en una representación `raw` completa, inmutable, trazable y reproducible, sin normalizar, corregir o traducir su contenido. El plan completo y los criterios del review están en [`docs/phase-1-extraction-plan.md`](docs/phase-1-extraction-plan.md).
 
-- Detectar todas sus páginas.
-- Extraer texto y orden de lectura.
-- Extraer coordenadas (`bbox`).
-- Extraer fuentes, tamaños y estilos.
-- Identificar y guardar imágenes.
-- Reconocer inicialmente títulos, párrafos, listas y bloques de código.
-- Generar identificadores únicos y estables.
-- Guardar un JSON válido.
-- Permitir repetir o reanudar la extracción.
+- [ ] Definir el contrato de ejecución, la CLI, los códigos de salida y la validación segura de entradas.
+- [ ] Implementar modelos y serialización JSON ajustados al contrato `raw` 1.0.0.
+- [ ] Inspeccionar documento, metadatos, páginas físicas, cajas, rotación, hash y procedencia.
+- [ ] Extraer bloques, líneas, spans, texto, geometría, fuentes, tamaños y estilos sin normalización.
+- [ ] Aplicar orden técnico determinista conservando la trazabilidad del motor.
+- [ ] Clasificar conservadoramente títulos, párrafos, listas, código, imágenes, encabezados y pies.
+- [ ] Extraer, identificar, deduplicar y guardar imágenes junto con todas sus apariciones.
+- [ ] Generar IDs estables reutilizando exclusivamente el esquema de identificación versionado.
+- [ ] Implementar escritura temporal y publicación atómica de `document.json` y assets.
+- [ ] Implementar checkpoints compatibles y reanudación sin pérdidas ni duplicados.
+- [ ] Añadir logs, métricas, warnings y estados `complete`, `partial` y `failed`.
+- [ ] Preparar pruebas unitarias, contrato, integración, repetición, interrupción y reanudación.
+- [ ] Validar automáticamente y revisar visualmente las páginas representativas.
+- [ ] Actualizar documentación, barrera de calidad y evidencias del review.
 
 **Resultado:** `data/raw/document.json` y recursos asociados.
 
-**Validación inicial:** páginas 19, 22 y 31, además de páginas representativas con código, imágenes y listas.
+**Validación inicial:** páginas físicas 19, 22 y 31, más portada, página gráfica, definición, lista y contraportada declaradas en el manifiesto. El dataset debe superar JSON Schema, validación semántica, estabilidad de IDs, reanudación simulada, cobertura mínima del 90 % y la barrera automática completa.
+
+**Criterio de Done:** ninguna página perdida, texto `raw` sin alteraciones, geometría y assets trazables, salida atómica válida, repetición estable, reanudación demostrada, documentación completa y ausencia de defectos críticos o altos.
 
 ### Fase 2 — Normalización y gobierno
 
