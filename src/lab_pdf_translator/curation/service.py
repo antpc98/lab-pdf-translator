@@ -26,7 +26,7 @@ def normalize(root: str|Path,input_path: str|Path|None=None,output_path: str|Pat
  raw_bytes=source.read_bytes(); raw_sha=hashlib.sha256(raw_bytes).hexdigest(); raw=json.loads(raw_bytes)
  profile=build_document_profile(raw); units,warnings=_units(raw,profile)
  assets=[{'asset_id':o['asset_id'],'asset_occurrence_id':o['asset_occurrence_id'],'page_id':p['page_id']} for p in raw['pages'] for o in p['asset_occurrences']]
- document={'schema_version':'2.0.0','document_id':raw['document_id'],'source_raw':{'path':'data/raw/document.json','sha256':raw_sha,'document_id':raw['document_id']},'document_profile':profile,'units':units,'assets':assets,'quality':{'metrics':_metrics(units,warnings)},'warnings':warnings}
+ document={'schema_version':'2.1.0','document_id':raw['document_id'],'source_raw':{'path':'data/raw/document.json','sha256':raw_sha,'document_id':raw['document_id']},'document_profile':profile,'units':units,'assets':assets,'quality':{'metrics':_metrics(units,warnings)},'warnings':warnings}
  issues=(*validate_schema(document,load_json(root/'schemas/curated-document.schema.json')),*validate_curated_semantics(document,raw))
  if issues: raise CurationError('Curated validation failed: '+'; '.join(str(x) for x in issues[:5]))
  profile_issues=validate_schema(profile,load_json(root/'schemas/document-profile.schema.json'))
@@ -108,7 +108,7 @@ def _page_units(page,median,pnums,psignals,recurrence,profile):
    for line in lines:
     text=''.join(s['text'] for s in line['spans']).strip();match=NAVIGATION.match(text)
     if match:
-     unit=_unit(page,b,[line],line['spans'],'paragraph',.93,['document-profile-navigation','line-ending-page-reference']);source_ids=[s['span_id'] for s in line['spans']];style=unit['segments'][0]['style'];unit.update({'semantic_type':'navigation','document_role':nav_role,'classification_family':nav_role,'label':match.group('label').strip(),'page_reference':match.group('reference'),'page_reference_source_span_ids':source_ids,'segments':[{'text':match.group('label').strip(),'protected':False,'style':style,'source_span_ids':source_ids},{'text':match.group('reference'),'protected':True,'style':style,'source_span_ids':source_ids}]});out.append(unit)
+     unit=_unit(page,b,[line],line['spans'],'paragraph',.93,['document-profile-navigation','line-ending-page-reference']);source_ids=[s['span_id'] for s in line['spans']];style=unit['segments'][0]['style'];reference=match.group('reference');start=unit['text'].rfind(reference);unit.update({'semantic_type':'navigation','document_role':nav_role,'classification_family':nav_role,'label':match.group('label').strip(),'page_reference':reference,'page_reference_source_span_ids':source_ids,'segments':[{'text':match.group('label').strip(),'protected':False,'style':style,'source_span_ids':source_ids},{'text':reference,'protected':True,'start':start,'end':start+len(reference),'style':style,'source_span_ids':source_ids}]});out.append(unit)
     elif text:
      if re.search(r'[A-Za-z]{2,}',text):
       unit=_unit(page,b,[line],line['spans'],'paragraph',.82,['document-profile-navigation','navigation-continuation']);unit.update({'semantic_type':'navigation','document_role':nav_role.replace('_entry','_continuation'),'classification_family':nav_role});out.append(unit)
@@ -172,22 +172,58 @@ def _profile_classify(text,page,block,lines,median,profile):
 
 def _unit(page,b,lines,spans,typ,confidence,signals):
  source={'page_ids':[page['page_id']],'block_ids':[b['block_id']],'line_ids':[l['line_id'] for l in lines],'span_ids':[s['span_id'] for s in spans]}; ids=set(source['span_ids']); code=typ=='code_block'
- parts=[''.join(s['text'] for s in l['spans'] if s['span_id'] in ids) for l in lines]; text='\n'.join(parts) if code else re.sub(r'\s+',' ',' '.join(parts)).strip()
+ parts=[''.join(s['text'] for s in l['spans'] if s['span_id'] in ids) for l in lines]
+ raw_text='\n'.join(parts) if code else ' '.join(parts)
+ text,positions=_canonical_text_positions(raw_text,code)
  bbox=[min(l['bbox'][0] for l in lines),min(l['bbox'][1] for l in lines),max(l['bbox'][2] for l in lines),max(l['bbox'][3] for l in lines)]
- u={'type':typ,'text':text,'translatable':typ not in {'code_block','header','footer','page_number','hash','url','email','identifier'},'confidence':confidence,'classification_signals':signals,'source':source,'segments':_segments(spans),'_bbox':bbox}
- if typ=='identifier':
-  for segment in u['segments']:segment['protected']=True
+ u={'type':typ,'text':text,'translatable':typ not in {'code_block','header','footer','page_number','hash','url','email','identifier'},'confidence':confidence,'classification_signals':signals,'source':source,'segments':_segments(lines,positions,typ=='identifier'),'_bbox':bbox}
  if code:u['lines']=parts
  return u
-def _segments(spans):
+def _canonical_text_positions(raw_text,code):
+ if code:return raw_text,list(range(len(raw_text)))
+ output=[]; positions=[]; index=0
+ while index<len(raw_text):
+  if raw_text[index].isspace():
+   end=index
+   while end<len(raw_text) and raw_text[end].isspace():end+=1
+   if output and end<len(raw_text):
+    output.append(' ');positions.extend([len(output)-1]*(end-index))
+   else:positions.extend([None]*(end-index))
+   index=end
+  else:
+   output.append(raw_text[index]);positions.append(len(output)-1);index+=1
+ return ''.join(output),positions
+def _segments(lines,positions,all_protected=False):
  out=[]
- for s in spans:
-  text=s['text']; style={'family':s['font'].get('family'),'size':s['font'].get('size'),'weight':s['font'].get('weight'),'style':s['font'].get('style')}; cursor=0
-  for m in TECH.finditer(text):
-   if m.start()>cursor:out.append({'text':text[cursor:m.start()],'protected':False,'style':style,'source_span_ids':[s['span_id']]})
-   out.append({'text':m.group(),'protected':True,'style':style,'source_span_ids':[s['span_id']]});cursor=m.end()
-  if cursor<len(text) or not out or out[-1]['source_span_ids']!=[s['span_id']]:out.append({'text':text[cursor:],'protected':False,'style':style,'source_span_ids':[s['span_id']]})
- return [x for x in out if x['text']]
+ raw_cursor=0
+ for line_index,line in enumerate(lines):
+  for s in line['spans']:
+   text=s['text']; style={'family':s['font'].get('family'),'size':s['font'].get('size'),'weight':s['font'].get('weight'),'style':s['font'].get('style')}; cursor=0
+   for m in TECH.finditer(text):
+    if m.start()>cursor:out.append(_segment(text[cursor:m.start()],all_protected,style,s['span_id'],raw_cursor+cursor,raw_cursor+m.start(),positions,all_protected))
+    out.append(_segment(m.group(),True,style,s['span_id'],raw_cursor+m.start(),raw_cursor+m.end(),positions,all_protected));cursor=m.end()
+   if cursor<len(text) or not out or out[-1]['source_span_ids']!=[s['span_id']]:out.append(_segment(text[cursor:],all_protected,style,s['span_id'],raw_cursor+cursor,raw_cursor+len(text),positions,all_protected))
+   raw_cursor+=len(text)
+  if line_index<len(lines)-1:raw_cursor+=1
+ return [x for x in out if x and x['text']]
+def _segment(text,protected,style,span_id,raw_start,raw_end,positions,all_protected=False):
+ result={'text':text,'protected':protected,'style':style,'source_span_ids':[span_id]}
+ if not protected:return result
+ mapped=[p for p in positions[raw_start:raw_end] if p is not None]
+ if text.isspace() and mapped:
+  # Canonical normalization collapses internal whitespace to one space.  Preserve
+  # the protection decision using the exact canonical substring, not RAW spacing.
+  start,end=min(mapped),max(mapped)+1
+  if end-start==1:return {**result,'text':' ','start':start,'end':end}
+ if len(mapped)!=len(text) or not mapped or mapped[-1]-mapped[0]+1!=len(mapped):
+  # Whitespace collapsed by canonical normalization is not a protectable substring.
+  if all_protected:return None
+  result['protected']=False;return result
+ start,end=mapped[0],mapped[-1]+1
+ if end-start==len(text):result.update({'start':start,'end':end})
+ elif all_protected:return None
+ else:result['protected']=False
+ return result
 def _image(page,b,oid):return {'type':'image_reference','text':'','translatable':False,'confidence':1.,'classification_signals':['raw-image-block'],'source':{'page_ids':[page['page_id']],'block_ids':[b['block_id']],'line_ids':[],'span_ids':[]},'segments':[],'asset_occurrence_id':oid,'_bbox':b['bbox']}
 def _semantics(typ):
  mapping={'document_title':('title','document_title'),'document_subtitle':('title','document_subtitle'),'chapter_title':('heading','chapter_title'),'section_heading':('heading','section_heading'),'subsection_heading':('heading','subsection_heading'),'paragraph':('body_text','paragraph'),'list_item':('list','list_item'),'caption':('caption','caption'),'code_block':('code','code_block'),'page_number':('page_structure','page_number'),'header':('page_structure','header'),'footer':('page_structure','footer'),'image_reference':('image','image_reference'),'unknown':('unknown','unknown')}
@@ -208,6 +244,10 @@ def _can_merge(a,b):
 def _merge(a,b):
  join='' if a['text'].endswith('-') and b['text'][:1].islower() else ' '
  if not join:a['text']=a['text'][:-1]
+ offset=len(a['text'])+len(join)
+ for segment in b['segments']:
+  if segment.get('protected'):
+   segment['start']+=offset;segment['end']+=offset
  a['text']+=join+b['text'];a['segments']+=b['segments'];a['classification_signals']=sorted(set(a['classification_signals']+b['classification_signals']+['paragraph-merge']))
  for k in a['source']:
   for v in b['source'][k]:

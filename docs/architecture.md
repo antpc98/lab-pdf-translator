@@ -39,3 +39,5 @@ F1 extraction ──► data/raw/document.json (inmutable)
 ## Frontera de F3
 
 F3 no necesita consultar PDF ni RAW para clasificar contenido. Debe preservar orden y contexto de sección, aplicar exactamente una acción por unidad y restaurar los segmentos protegidos de forma literal después de traducir el texto permitido.
+
+Desde Curated 2.1.0, cada segmento protegido declara `start` y `end` como índices de caracteres Python sobre `unit.text`. El contrato exige `unit.text[start:end] == segment.text`, rangos ordenados y no solapados. Esos rangos son procedencia sobre el texto Curated canónico; no reemplazan la procedencia RAW por spans.

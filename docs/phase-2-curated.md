@@ -25,6 +25,10 @@ Una entrada de TOC o índice conserva por separado `label`, `page_reference` y `
 
 Los bloques de código son no traducibles y su texto debe ser exactamente la unión de `lines` con saltos de línea. Un `technical_value` también es no traducible y todos sus segmentos están protegidos. En prosa mixta, la unidad puede traducirse, pero sus tokens técnicos quedan como segmentos protegidos.
 
+## Patch contractual 2.1.0
+
+El contrato añade `start` y `end` obligatorios para cada segmento protegido. Son índices de caracteres Python contra `unit.text`; deben recuperar exactamente `segment.text`, aparecer ordenados y no solaparse. No se exige que todos los segmentos formen una partición completa del texto normalizado. Esta mejora resuelve la dependencia de F3 de localizar y restaurar contenido protegido sin consultar RAW.
+
 ## Contrato de consumo para Fase 3
 
 Fase 3 debe consumir `f3-translation-stream.csv` sin reinterpretar el PDF:

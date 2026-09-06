@@ -25,6 +25,15 @@ def validate_curated_semantics(doc: dict[str,Any], raw: dict[str,Any]) -> tuple[
   if u.get("type") == "code_block":
    code_lines=u.get("lines")
    if not isinstance(code_lines,list) or "\n".join(code_lines) != u.get("text"): issues.append(ValidationIssue("INVALID_CODE_LINES",path,"code lines must reconstruct exact code text"))
+  protected_ranges=[]
   for segment in u.get("segments", []):
    if not segment.get("source_span_ids"): issues.append(ValidationIssue("MISSING_SEGMENT_PROVENANCE",path,"segment must retain source span"))
+   if segment.get("protected"):
+    start,end=segment.get("start"),segment.get("end")
+    if isinstance(start,bool) or isinstance(end,bool) or not isinstance(start,int) or not isinstance(end,int): issues.append(ValidationIssue("MISSING_PROTECTED_RANGE",path,"protected segment needs integer start/end"));continue
+    if not 0<=start<end<=len(u.get("text", "")): issues.append(ValidationIssue("INVALID_PROTECTED_RANGE",path,"protected range must be within unit text"));continue
+    if u["text"][start:end]!=segment.get("text"): issues.append(ValidationIssue("PROTECTED_RANGE_TEXT_MISMATCH",path,"protected range must recover segment text"));continue
+    protected_ranges.append((start,end))
+  if protected_ranges != sorted(protected_ranges): issues.append(ValidationIssue("UNORDERED_PROTECTED_RANGES",path,"protected ranges must be ordered"))
+  if any(left[1]>right[0] for left,right in zip(protected_ranges,protected_ranges[1:])): issues.append(ValidationIssue("OVERLAPPING_PROTECTED_RANGES",path,"protected ranges must not overlap"))
  return tuple(issues)

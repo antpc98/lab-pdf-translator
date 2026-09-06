@@ -34,3 +34,7 @@ F3 opera solo sobre Curated: `unit_id`, `reading_order`, `text`, `semantic_type`
 - 51 candidatos geométricos para muestreo futuro de orden de lectura.
 - 117 posibles continuaciones entre páginas; ninguna clasificada como probable.
 - Validación futura de generalización del perfil sobre más tipos de documento.
+
+## Patch contractual para F3
+
+El bloqueo de rangos protegidos no alineados con el texto Curated quedó resuelto mediante el contrato 2.1.0. Los segmentos protegidos llevan rangos `start`/`end` de índices Python sobre el texto canónico, con validación de límites, igualdad de substring, orden y ausencia de solapamientos. El enriquecimiento no altera unidades, orden, texto, clasificación, procedencia ni perfil documental.
